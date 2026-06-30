@@ -1,0 +1,14 @@
+{
+  "name": "omo-grok",
+  "version": "0.1.0",
+  "description": "oh-my-openagent Light edition for Grok Build CLI — rules (.omo/rules), comment-checker, ultrawork, ulw-loop, boulder continuation, LSP, ast-grep",
+  "skills": ["./skills"],
+  "author": {
+    "name": "heomin"
+  },
+  "homepage": "https://github.com/code-yeongyu/oh-my-openagent",
+  "repository": "https://github.com/code-yeongyu/oh-my-openagent",
+  "license": "SUL-1.0",
+  "categories": ["productivity", "workflow"],
+  "keywords": ["grok-cli", "oh-my-openagent", "omo", "ultrawork", "ulw-loop", "comment-checker"]
+}

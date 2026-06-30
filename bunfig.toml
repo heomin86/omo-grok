@@ -1,0 +1,6 @@
+[resolve.alias]
+"@oh-my-opencode/rules-engine/engine" = "./vendor/rules-engine/src/engine/index.ts"
+"@oh-my-opencode/comment-checker-core" = "./vendor/comment-checker-core/src/index.ts"
+"@oh-my-opencode/hashline-core" = "./vendor/hashline-core/src/index.ts"
+"@oh-my-opencode/utils" = "./vendor/utils/src/index.ts"
+"@oh-my-opencode/utils/record-type-guard" = "./vendor/utils/src/record-type-guard.ts"

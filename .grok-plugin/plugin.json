@@ -1,0 +1,6 @@
+{
+  "name": "omo-grok",
+  "version": "0.1.0",
+  "description": "oh-my-openagent Light edition for Grok Build CLI",
+  "skills": ["./skills"]
+}

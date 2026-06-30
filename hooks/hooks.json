@@ -1,0 +1,96 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" session-start",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" user-prompt",
+            "timeout": 25
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "StrReplace|Edit|multi_edit|multiedit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" pre-tool-hashline",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "update_goal",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" pre-tool-update-goal",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" post-tool-read",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "Write|StrReplace|EditNotebook",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" post-tool-lsp",
+            "timeout": 30
+          },
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" post-tool-comment-checker",
+            "timeout": 30
+          }
+        ]
+      },
+      {
+        "matcher": "Write|StrReplace",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" post-tool-rules",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" stop",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

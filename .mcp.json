@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ast_grep": {
+      "command": "node",
+      "args": ["${GROK_PLUGIN_ROOT}/vendor/ast-grep-mcp/dist/cli.js", "mcp"]
+    },
+    "lsp": {
+      "command": "node",
+      "args": ["${GROK_PLUGIN_ROOT}/vendor/lsp-tools-mcp/dist/cli.js", "mcp"]
+    }
+  }
+}

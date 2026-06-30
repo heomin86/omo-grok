@@ -1,0 +1,49 @@
+{
+  "name": "omo-grok",
+  "version": "0.1.0",
+  "description": "Grok CLI adapter for oh-my-openagent Light edition — persistent install at ~/omo-grok",
+  "type": "module",
+  "bin": {
+    "omo-grok-hook": "./dist/cli.js",
+    "omo-grok-ulw-loop": "./components/ulw-loop/dist/cli.js"
+  },
+  "scripts": {
+    "build": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\" && bun build src/cli.ts --target node --format esm --outfile dist/cli.js --external @code-yeongyu/comment-checker && npm run build:ulw-loop --silent",
+    "build:ulw-loop": "node -e \"require('node:fs').rmSync('components/ulw-loop/dist',{recursive:true,force:true})\" && cd components/ulw-loop && npx tsc -p tsconfig.build.json",
+    "pretest": "node scripts/write-changed-files-manifest.mjs",
+    "test": "npm run build --silent && RUN_VERIFY_GATES=1 GROK_SKIP_PLUGIN_INSTALL=1 vitest --run",
+    "verify-gates": "bash scripts/verify-gates.sh",
+    "capture-ulw-grok-evidence": "node scripts/capture-ulw-grok-gate-evidence.mjs",
+    "run-verification-plan": "node scripts/run-verification-plan.mjs",
+    "write-changed-files": "node scripts/write-changed-files-manifest.mjs",
+    "run-user-verification": "node scripts/run-user-verification-steps.mjs",
+    "run-scratch-verification": "bash scripts/run-scratch-verification.sh",
+    "emit-scratch-evidence": "node scripts/vitest-global-setup.mjs",
+    "populate-scratch-evidence": "node scripts/populate-scratch-evidence.mjs",
+    "goal-verify": "node scripts/populate-scratch-evidence.mjs",
+    "install-plugin": "bash scripts/install-plugin.sh",
+    "verify-ast-grep": "bash scripts/verify-ast-grep-mcp.sh",
+    "typecheck": "tsc --noEmit",
+    "postinstall": "node -e \"const cc=require('@code-yeongyu/comment-checker');const b=cc.getBinaryPath();const fs=require('fs');console.log('[omo-grok] comment-checker binary:',fs.existsSync(b)?b:'MISSING')\""
+  },
+  "dependencies": {
+    "@code-yeongyu/comment-checker": "^0.8.0",
+    "diff": "^9.0.0",
+    "picomatch": "^4.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.3",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.8"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "imports": {
+    "@oh-my-opencode/rules-engine/engine": "./vendor/rules-engine/src/engine/index.ts",
+    "@oh-my-opencode/comment-checker-core": "./vendor/comment-checker-core/src/index.ts",
+    "@oh-my-opencode/hashline-core": "./vendor/hashline-core/src/index.ts",
+    "@oh-my-opencode/utils": "./vendor/utils/src/index.ts",
+    "@oh-my-opencode/utils/record-type-guard": "./vendor/utils/src/record-type-guard.ts"
+  }
+}
