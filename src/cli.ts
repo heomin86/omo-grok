@@ -40,6 +40,13 @@ import {
 async function main(): Promise<void> {
   const subcommand = process.argv[2];
   if (!subcommand) process.exit(0);
+
+  // `orchestrate` is a top-level driver (args come from argv), not a stdin hook.
+  if (subcommand === "orchestrate") {
+    const { runOrchestrateCli } = await import("./orchestrate-cli.js");
+    process.exit(await runOrchestrateCli(process.argv.slice(3)));
+  }
+
   const raw = await readStdin();
   const event = parseGrokEvent(raw);
   if (event === null) process.exit(0);
