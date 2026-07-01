@@ -12,23 +12,22 @@ afterEach(() => {
 });
 
 describe("comment-checker", () => {
-  it("blocks slop comments on StrReplace", async () => {
+  it("denies slop comments on search_replace via PreToolUse", async () => {
     const ws = mkdtempSync(join(tmpdir(), "omo-grok-cc-"));
     temps.push(ws);
-    const { stdout } = await runHook("post-tool-comment-checker", {
-      hookEventName: "PostToolUse",
+    const { stdout } = await runHook("pre-tool-comment-checker", {
+      hookEventName: "PreToolUse",
       sessionId: "test-cc",
       workspaceRoot: ws,
-      toolName: "StrReplace",
+      toolName: "search_replace",
       toolInput: {
         path: "src/foo.ts",
         old_string: "const x = 1;",
         new_string: "// TODO: implement this properly\nconst x = 2;",
       },
-      toolResponse: "ok",
     });
     const parsed = JSON.parse(stdout.trim());
-    expect(parsed.decision).toBe("block");
+    expect(parsed.decision).toBe("deny");
     expect(parsed.reason).toMatch(/comment-checker|COMMENT\/DOCSTRING/i);
   });
 });

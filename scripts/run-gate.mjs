@@ -13,12 +13,10 @@ if (!pluginRoot) {
   process.exit(2);
 }
 
-const REQUIRES_OUTPUT = new Set([
-  "session-start",
-  "user-prompt",
-  "stop",
-  "post-tool-comment-checker",
-]);
+// Grok ignores SessionStart/PostToolUse stdout, so session-start materializes
+// AGENTS.md (no stdout) and comment-checker moved to a PreToolUse deny that only
+// emits on a violation. Only user-prompt/stop still produce steering stdout.
+const REQUIRES_OUTPUT = new Set(["user-prompt", "stop"]);
 
 const cli = `${pluginRoot}/dist/cli.js`;
 const child = spawn(process.execPath, [cli, subcommand], {

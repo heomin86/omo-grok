@@ -24,12 +24,22 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "StrReplace|Edit|multi_edit|multiedit",
+        "matcher": "search_replace|Edit|MultiEdit",
         "hooks": [
           {
             "type": "command",
             "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" pre-tool-hashline",
             "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "search_replace|write_file|Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" pre-tool-comment-checker",
+            "timeout": 30
           }
         ]
       },
@@ -46,7 +56,7 @@
     ],
     "PostToolUse": [
       {
-        "matcher": "Read",
+        "matcher": "read_file|Read",
         "hooks": [
           {
             "type": "command",
@@ -56,27 +66,12 @@
         ]
       },
       {
-        "matcher": "Write|StrReplace|EditNotebook",
+        "matcher": "search_replace|write_file|Edit|Write|MultiEdit",
         "hooks": [
           {
             "type": "command",
             "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" post-tool-lsp",
             "timeout": 30
-          },
-          {
-            "type": "command",
-            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" post-tool-comment-checker",
-            "timeout": 30
-          }
-        ]
-      },
-      {
-        "matcher": "Write|StrReplace",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"${GROK_PLUGIN_ROOT}/hooks/run-hook.sh\" post-tool-rules",
-            "timeout": 15
           }
         ]
       }

@@ -10,7 +10,7 @@ const ulwCli = join(repoRoot, "components", "ulw-loop", "dist", "cli.js");
 const seedScript = join(repoRoot, "scripts", "seed-ulw-grok-gate-fixture.mjs");
 const scratch =
   process.env.SCRATCH ??
-  "/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-647755b4e031/implementer";
+  join(tmpdir(), "omo-grok-scratch");
 const scratchCheckpointLog = join(scratch, "checkpoint-grok-from-test.log");
 
 function recordScratch(section: string, body: string): void {

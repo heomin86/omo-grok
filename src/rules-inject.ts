@@ -1,10 +1,9 @@
-import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 import { createEngine, defaultConfig } from "@oh-my-opencode/rules-engine/engine";
 import { findRuleCandidates } from "@oh-my-opencode/rules-engine/engine";
 import { findProjectRoot } from "@oh-my-opencode/rules-engine/engine";
-import { formatStaticBlock } from "@oh-my-opencode/rules-engine/engine";
 
 function pluginDataRoot(): string {
   const root = process.env["GROK_PLUGIN_DATA"] ?? process.env["GROK_HOME"] ?? join(process.env["HOME"] ?? "/tmp", ".grok");
@@ -57,7 +56,7 @@ export function injectStaticRules(cwd: string, sessionId: string): string {
     engine.state.cwd = cwd;
     const loaded = engine.loadStaticRules(cwd);
     const rules = loaded.rules.filter((rule) => !engine.isStaticInjected(rule));
-    block = rules.length > 0 ? formatStaticBlock(rules) : "";
+    block = rules.length > 0 ? engine.formatStatic(rules) : "";
     if (rules.length > 0) {
       for (const rule of rules) engine.markStaticInjected(rule);
     }
@@ -100,4 +99,64 @@ function walkMdFiles(dir: string): string[] {
 export function formatOmoRulesContext(block: string): string {
   if (block.trim().length === 0) return "";
   return `<OMO_RULES>\n${block}\n</OMO_RULES>`;
+}
+
+const AGENTS_BEGIN = "<!-- BEGIN omo-grok rules (auto-generated; edits inside this block are overwritten) -->";
+const AGENTS_END = "<!-- END omo-grok rules -->";
+
+export function agentsMdRulesEnabled(): boolean {
+  return process.env["OMO_RULES_AGENTS_MD"] !== "0";
+}
+
+// Full static-rules block, ignoring per-session injection state, so AGENTS.md
+// always reflects every rule regardless of what a prior SessionStart injected.
+export function renderStaticRulesBlock(cwd: string): string {
+  try {
+    const engine = createRulesEngine(cwd);
+    engine.state.cwd = cwd;
+    const loaded = engine.loadStaticRules(cwd);
+    if (loaded.rules.length > 0) return engine.formatStatic(loaded.rules);
+  } catch {
+    // fall through to filesystem fallback
+  }
+  return loadOmoRulesFallback(cwd);
+}
+
+function agentsMdManagedSection(cwd: string): string {
+  const block = renderStaticRulesBlock(cwd).trim();
+  if (block.length === 0) return "";
+  return `${AGENTS_BEGIN}\n\n## omo-grok project rules\n\n${block}\n\n${AGENTS_END}`;
+}
+
+function replaceManagedSection(existing: string, section: string): string {
+  const begin = existing.indexOf(AGENTS_BEGIN);
+  if (begin === -1) {
+    if (section.length === 0) return existing;
+    const separator = existing.trim().length === 0 ? "" : `${existing.replace(/\s*$/, "")}\n\n`;
+    return `${separator}${section}\n`;
+  }
+  const endMarker = existing.indexOf(AGENTS_END, begin);
+  const end = endMarker === -1 ? existing.length : endMarker + AGENTS_END.length;
+  const before = existing.slice(0, begin).replace(/\s*$/, "");
+  const after = existing.slice(end).replace(/^\s*/, "");
+  const parts: string[] = [];
+  if (before.length > 0) parts.push(before);
+  if (section.length > 0) parts.push(section);
+  if (after.length > 0) parts.push(after);
+  return parts.length === 0 ? "" : `${parts.join("\n\n")}\n`;
+}
+
+// Writes the omo-grok rules into a managed block of the workspace AGENTS.md.
+// Grok injects AGENTS.md into context statically, unlike SessionStart stdout
+// which it ignores. Returns true when the file was changed.
+export function syncAgentsMdRules(cwd: string): boolean {
+  if (!agentsMdRulesEnabled()) return false;
+  const agentsPath = join(cwd, "AGENTS.md");
+  const existing = existsSync(agentsPath) ? readFileSync(agentsPath, "utf8") : "";
+  const section = agentsMdManagedSection(cwd);
+  if (existing.indexOf(AGENTS_BEGIN) === -1 && section.length === 0) return false;
+  const next = replaceManagedSection(existing, section);
+  if (next === existing) return false;
+  writeFileSync(agentsPath, next);
+  return true;
 }

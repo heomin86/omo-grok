@@ -2,15 +2,15 @@
 
 Grok Build plugin adapter porting omo Light edition components:
 
-- **rules** — `.omo/rules/**` injection (rules-engine + fallback scanner)
-- **comment-checker** — blocks AI slop comments after `Write`/`StrReplace`
+- **rules** — `.omo/rules/**` materialized into a managed block of `AGENTS.md` on `SessionStart` (Grok ignores `SessionStart` stdout, so a static file is used instead; set `OMO_RULES_AGENTS_MD=0` to disable)
+- **comment-checker** — blocks AI slop comments on `PreToolUse` for `search_replace`/`write_file` (Claude aliases `Edit`/`Write`)
 - **ultrawork / ulw-loop** — keyword detection + `.omo/ulw-loop/<session>/` durable state
 - **start-work-continuation** — boulder `.omo/boulder.json` Stop chain
 
 ## Install
 
 ```bash
-cd packages/omo-grok && npm run build
+npm run build
 npm run install-plugin   # stages without node_modules; grok plugin install --trust exits 0
 ```
 

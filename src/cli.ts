@@ -19,7 +19,7 @@ import {
   parseGrokEvent,
   readStdin,
 } from "./grok-io.js";
-import { formatOmoRulesContext, injectStaticRules } from "./rules-inject.js";
+import { syncAgentsMdRules } from "./rules-inject.js";
 import {
   applyFullUlwLoopSteering,
   evaluateUpdateGoalPreToolUse,
@@ -63,11 +63,8 @@ async function main(): Promise<void> {
     case "post-tool-lsp":
       await handlePostToolLsp(event);
       break;
-    case "post-tool-comment-checker":
+    case "pre-tool-comment-checker":
       await handleCommentChecker(event);
-      break;
-    case "post-tool-rules":
-      await handlePostToolRules(event);
       break;
     case "stop":
       await handleStop(event);
@@ -77,25 +74,19 @@ async function main(): Promise<void> {
   }
 }
 
-function safeInjectRules(cwd: string, sessionId: string): string {
-  try {
-    return injectStaticRules(cwd, sessionId);
-  } catch {
-    return "";
-  }
-}
-
+// Grok ignores SessionStart stdout, so static .omo rules are materialized into a
+// managed block of the workspace AGENTS.md, which Grok does load into context.
 async function handleSessionStart(event: Awaited<ReturnType<typeof parseGrokEvent>> & object): Promise<void> {
-  const block = safeInjectRules(event.workspaceRoot, event.sessionId);
-  emitAdditionalContext([formatOmoRulesContext(block)]);
+  try {
+    syncAgentsMdRules(event.workspaceRoot);
+  } catch {
+    // fail-open: never block session start on rules materialization
+  }
 }
 
 async function handleUserPrompt(event: Awaited<ReturnType<typeof parseGrokEvent>> & object): Promise<void> {
   const prompt = event.prompt ?? "";
   const parts: string[] = [];
-
-  const rulesBlock = safeInjectRules(event.workspaceRoot, event.sessionId);
-  if (rulesBlock.length > 0) parts.push(formatOmoRulesContext(rulesBlock));
 
   const steering = await applyFullUlwLoopSteering(event.workspaceRoot, event.sessionId, prompt);
   if (steering.length > 0) parts.push(steering);
@@ -150,11 +141,7 @@ async function handleCommentChecker(event: Awaited<ReturnType<typeof parseGrokEv
       warnings.push(`comment-checker found issues in ${request.filePath}:\n${result.message}`);
     }
   }
-  if (warnings.length > 0) emitBlock(warnings.join("\n\n"));
-}
-
-async function handlePostToolRules(_event: Awaited<ReturnType<typeof parseGrokEvent>> & object): Promise<void> {
-  // Static .omo/rules injection runs on SessionStart/UserPromptSubmit via rules-engine.
+  if (warnings.length > 0) emitDeny(warnings.join("\n\n"));
 }
 
 async function handleStop(event: Awaited<ReturnType<typeof parseGrokEvent>> & object): Promise<void> {
@@ -191,7 +178,7 @@ async function handleStop(event: Awaited<ReturnType<typeof parseGrokEvent>> & ob
   }
 }
 
-export { injectStaticRules } from "./rules-inject.js";
+export { injectStaticRules, syncAgentsMdRules } from "./rules-inject.js";
 export { isUltraworkPrompt, stopUlwLoopContinuation } from "./ultrawork.js";
 export { extractGrokCommentCheckRequests } from "./comment-checker-grok.js";
 export { validateHashlinePreTool, updateHashlineCacheFromRead } from "./hashline-grok.js";

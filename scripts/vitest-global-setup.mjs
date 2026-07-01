@@ -4,13 +4,14 @@
  * On failure, writes global-setup-error.log and defers to test/00-scratch-evidence-emit.test.ts.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { emitScratchEvidence } from "./scratch-evidence-core.mjs";
 
 export async function setup() {
   const scratch =
     process.env.SCRATCH ??
-    "/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-647755b4e031/implementer";
+    join(tmpdir(), "omo-grok-scratch");
 
   mkdirSync(scratch, { recursive: true });
 

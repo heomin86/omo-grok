@@ -4,7 +4,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SCRATCH="${SCRATCH:-/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-647755b4e031/implementer}"
+SCRATCH="${SCRATCH:-${TMPDIR:-/tmp}/omo-grok-scratch}"
 ULW_LOOP_BIN="$ROOT/components/ulw-loop/dist/cli.js"
 RUN_GATE=(node "$ROOT/scripts/run-gate.mjs")
 

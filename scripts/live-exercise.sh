@@ -2,8 +2,8 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SCRATCH="${SCRATCH:-/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-1eb868a906f7/implementer}"
-WS="/Users/heomin"
+SCRATCH="${SCRATCH:-${TMPDIR:-/tmp}/omo-grok-scratch}"
+WS="${WS:-$(mktemp -d "${TMPDIR:-/tmp}/omo-grok-live.XXXXXX")}"
 RUN_GATE=(node "$ROOT/scripts/run-gate.mjs")
 
 resolve_plugin_root() {

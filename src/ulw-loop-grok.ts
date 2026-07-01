@@ -24,7 +24,9 @@ export function hasFullUlwLoopPlan(cwd: string, sessionId: string): boolean {
   return resolveUlwLoopReadScope(cwd, sessionId) !== null;
 }
 
-export function resolveUlwLoopReadScope(cwd: string, sessionId: string): UlwLoopScope | undefined {
+// Returns the session-scoped scope when a session plan exists, `undefined` for a
+// workspace-global plan, and `null` when no ulw-loop plan is present at all.
+export function resolveUlwLoopReadScope(cwd: string, sessionId: string): UlwLoopScope | null | undefined {
   if (existsSync(ulwLoopGoalsPath(cwd, ulwLoopScope(sessionId)))) return ulwLoopScope(sessionId);
   if (existsSync(ulwLoopGoalsPath(cwd))) return undefined;
   return null;
@@ -102,7 +104,8 @@ export async function stopFullUlwLoopContinuation(
     if (isUlwLoopDone(plan)) return null;
 
     const summary = summarizeUlwLoopPlan(plan);
-    const sessionOpt = scope?.sessionId === undefined ? "" : sessionFlag(scope.sessionId);
+    const scopeSessionId = scope?.sessionId;
+    const sessionOpt = typeof scopeSessionId === "string" ? sessionFlag(scopeSessionId) : "";
     const resume = `omo-grok-ulw-loop complete-goals${sessionOpt} --goal-runtime grok`;
     const active = plan.goals.find((goal) => goal.status === "in_progress");
     const handoff =
