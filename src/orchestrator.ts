@@ -92,10 +92,8 @@ function runGrok(cliArgs: string[], cwd: string): Promise<string> {
 }
 
 export function parseTurn(stdout: string, fallbackSessionId: string): GrokTurn {
-  const line = lastJsonLine(stdout);
-  if (line === null) throw new Error("grok produced no JSON output");
-  const parsed: unknown = JSON.parse(line);
-  if (!isRecord(parsed)) throw new Error("grok output was not a JSON object");
+  const parsed = extractJsonObject(stdout);
+  if (parsed === null) throw new Error("grok produced no JSON output");
   if (parsed["type"] === "error") {
     const message = parsed["message"];
     throw new Error(`grok error: ${typeof message === "string" ? message : "unknown"}`);
@@ -107,12 +105,28 @@ export function parseTurn(stdout: string, fallbackSessionId: string): GrokTurn {
   };
 }
 
-function lastJsonLine(stdout: string): string | null {
-  const lines = stdout
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith("{") && line.endsWith("}"));
-  return lines.length > 0 ? (lines[lines.length - 1] ?? null) : null;
+// `--output-format json` emits one pretty-printed (multi-line) object; parse the
+// whole buffer first, then fall back to the last JSON line (streaming-json).
+function extractJsonObject(stdout: string): Record<string, unknown> | null {
+  const trimmed = stdout.trim();
+  if (trimmed.length === 0) return null;
+  const whole = tryParseRecord(trimmed);
+  if (whole !== null) return whole;
+  const lines = trimmed.split(/\r?\n/).map((line) => line.trim()).filter((line) => line.length > 0);
+  for (let i = lines.length - 1; i >= 0; i -= 1) {
+    const record = tryParseRecord(lines[i] ?? "");
+    if (record !== null) return record;
+  }
+  return null;
+}
+
+function tryParseRecord(text: string): Record<string, unknown> | null {
+  try {
+    const parsed: unknown = JSON.parse(text);
+    return isRecord(parsed) ? parsed : null;
+  } catch {
+    return null;
+  }
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

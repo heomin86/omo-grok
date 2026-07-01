@@ -100,6 +100,15 @@ describe("headless orchestrator", () => {
       expect(turn).toEqual({ text: "hi", sessionId: "abc", stopReason: "EndTurn" });
     });
 
+    it("parses a pretty-printed (multi-line) json object", () => {
+      // #given the exact shape `grok -p --output-format json` prints
+      const stdout = '{\n  "text": "PONG",\n  "stopReason": "EndTurn",\n  "sessionId": "abc"\n}\n';
+      // #when parsing
+      const turn = parseTurn(stdout, "fallback");
+      // #then the whole-buffer parse succeeds
+      expect(turn).toEqual({ text: "PONG", sessionId: "abc", stopReason: "EndTurn" });
+    });
+
     it("throws on a grok error object", () => {
       // #given an error payload
       const stdout = '{"type":"error","message":"boom"}';
