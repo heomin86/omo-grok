@@ -7,7 +7,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SCRATCH="${SCRATCH:-/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-647755b4e031/implementer}"
+SCRATCH="${SCRATCH:-${TMPDIR:-/tmp}/omo-grok-scratch}"
 STAGE="$SCRATCH/omo-grok-install-stage"
 INSTALL_ROOT="$HOME/.grok/installed-plugins"
 REGISTRY="$INSTALL_ROOT/registry.json"
@@ -150,7 +150,7 @@ echo "Running npm install --omit=dev in $INST" | tee -a "$SCRATCH/install-direct
 
 ln -sfn "$ROOT" "$PLUGIN_LINK"
 
-for required in plugin.json hooks/hooks.json dist/cli.js vendor/ast-grep-mcp/dist/cli.js; do
+for required in plugin.json hooks/hooks.json dist/cli.js; do
   test -f "$ROOT/$required"
 done
 

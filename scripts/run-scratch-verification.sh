@@ -2,7 +2,7 @@
 # One-shot SCRATCH evidence refresh for ulw-loop Grok goal verification.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SCRATCH="${SCRATCH:-/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-647755b4e031/implementer}"
+SCRATCH="${SCRATCH:-${TMPDIR:-/tmp}/omo-grok-scratch}"
 export SCRATCH
 export GROK_SKIP_PLUGIN_INSTALL=1
 export RUN_VERIFY_GATES=1

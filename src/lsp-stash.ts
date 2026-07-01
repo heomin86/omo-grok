@@ -20,6 +20,8 @@ const CLEAN_TEXT = "No diagnostics found";
 const UNSUPPORTED_PREFIX = "No LSP server configured for extension:";
 
 const MUTATION_TOOLS = new Set([
+  "search_replace",
+  "write_file",
   "write",
   "strreplace",
   "str_replace",

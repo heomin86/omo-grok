@@ -102,7 +102,7 @@ export function updateHashlineCacheFromRead(
 export function validateHashlinePreTool(event: GrokHookEvent): string | null {
   if (!hashlineEnabled()) return null;
   const tool = (event.toolName ?? "").toLowerCase();
-  if (!["strreplace", "str_replace", "edit", "multiedit", "multi_edit"].includes(tool)) {
+  if (!["search_replace", "strreplace", "str_replace", "edit", "multiedit", "multi_edit"].includes(tool)) {
     return null;
   }
   const input = event.toolInput ?? {};

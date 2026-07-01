@@ -1,4 +1,4 @@
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -12,7 +12,9 @@ afterEach(() => {
 });
 
 describe("rules injection", () => {
-  it("injects .omo/rules on UserPromptSubmit", async () => {
+  // Grok ignores SessionStart/UserPromptSubmit stdout, so static rules are
+  // materialized into a managed block of AGENTS.md on SessionStart instead.
+  it("materializes .omo/rules into AGENTS.md on SessionStart", async () => {
     const ws = mkdtempSync(join(tmpdir(), "omo-grok-rules-"));
     temps.push(ws);
     mkdirSync(join(ws, ".omo", "rules"), { recursive: true });
@@ -21,13 +23,15 @@ describe("rules injection", () => {
       join(ws, ".omo", "rules", "test.md"),
       "---\nalwaysApply: true\n---\n# Rule\nOMO_RULE_MARKER must appear.\n",
     );
-    const { stdout } = await runHook("user-prompt", {
-      hookEventName: "UserPromptSubmit",
+    await runHook("session-start", {
+      hookEventName: "SessionStart",
       sessionId: `test-rules-${Date.now()}`,
       workspaceRoot: ws,
-      prompt: "hello",
     });
-    expect(stdout).toContain("OMO_RULE_MARKER");
-    expect(stdout).toContain("OMO_RULES");
+    const agentsPath = join(ws, "AGENTS.md");
+    expect(existsSync(agentsPath)).toBe(true);
+    const agents = readFileSync(agentsPath, "utf8");
+    expect(agents).toContain("OMO_RULE_MARKER");
+    expect(agents).toContain("omo-grok rules");
   });
 });

@@ -40,7 +40,7 @@ export function extractGrokCommentCheckRequests(event: GrokHookEvent): CommentCh
 function extractFromToolResult(event: ToolResultLike): CommentCheckRequest[] {
   const toolName = event.toolName.toLowerCase();
   if (toolName === "write") return extractWrite(event);
-  if (toolName === "edit" || toolName === "strreplace") return extractEdit(event);
+  if (toolName === "edit") return extractEdit(event);
   return [];
 }
 
@@ -68,9 +68,21 @@ function extractEdit(event: ToolResultLike): CommentCheckRequest[] {
 
 function mapGrokTool(toolName: string, input: Record<string, unknown>): { toolName: string; input: Record<string, unknown> } | null {
   const lower = toolName.toLowerCase();
-  if (lower === "write") return { toolName: "Write", input };
-  if (lower === "strreplace" || lower === "edit") return { toolName: "Edit", input };
+  // Grok native tool names plus Claude-style aliases. Grok normalizes Edit/Write/
+  // MultiEdit to search_replace, but a write with only `content` (no old_string) is
+  // treated as a full-file Write for comment-checker purposes.
+  if (lower === "write" || lower === "write_file") return { toolName: "Write", input };
+  if (lower === "search_replace" || lower === "strreplace" || lower === "str_replace") {
+    return hasEditFields(input) ? { toolName: "Edit", input } : { toolName: "Write", input };
+  }
+  if (lower === "edit" || lower === "multiedit" || lower === "multi_edit") {
+    return { toolName: "Edit", input };
+  }
   return null;
+}
+
+function hasEditFields(input: Record<string, unknown>): boolean {
+  return getString(input, ["oldString", "old_string"]) !== undefined;
 }
 
 function toolResponseToContent(toolResponse: unknown): readonly ToolResultContent[] {

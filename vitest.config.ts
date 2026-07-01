@@ -1,11 +1,11 @@
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig, defineProject } from "vitest/config";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const scratchDir =
-  process.env.SCRATCH ??
-  "/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-647755b4e031/implementer";
+  process.env.SCRATCH ?? path.join(tmpdir(), "omo-grok-scratch");
 
 const vendorAliases = {
   "@oh-my-opencode/rules-engine/engine": path.resolve(root, "vendor/rules-engine/src/engine/index.ts"),

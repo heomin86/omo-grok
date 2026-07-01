@@ -17,8 +17,7 @@ import { tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const defaultScratch =
-  "/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-647755b4e031/implementer";
+const defaultScratch = join(tmpdir(), "omo-grok-scratch");
 
 export const CHANGED_FILE_PATHS = [
   "package.json",

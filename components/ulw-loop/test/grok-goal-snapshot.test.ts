@@ -6,7 +6,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 const scratch =
   process.env.SCRATCH ??
-  "/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-647755b4e031/implementer";
+  join(tmpdir(), "omo-grok-scratch");
 
 import {
   extractObjectiveFromPlanMarkdown,

@@ -6,8 +6,8 @@
   "author": {
     "name": "heomin"
   },
-  "homepage": "https://github.com/code-yeongyu/oh-my-openagent",
-  "repository": "https://github.com/code-yeongyu/oh-my-openagent",
+  "homepage": "https://github.com/heomin86/omo-grok",
+  "repository": "https://github.com/heomin86/omo-grok",
   "license": "SUL-1.0",
   "categories": ["productivity", "workflow"],
   "keywords": ["grok-cli", "oh-my-openagent", "omo", "ultrawork", "ulw-loop", "comment-checker"]

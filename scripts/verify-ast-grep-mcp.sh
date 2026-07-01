@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-SCRATCH="${SCRATCH:-/var/folders/q7/sw9lqwgs0yndxsytmc3w019m0000gn/T/grok-goal-1eb868a906f7/implementer}"
+SCRATCH="${SCRATCH:-${TMPDIR:-/tmp}/omo-grok-scratch}"
 
 resolve_plugin_root() {
   local path
@@ -16,7 +16,7 @@ resolve_plugin_root() {
 
 export GROK_PLUGIN_ROOT="$(resolve_plugin_root)"
 MCP_CLI="$GROK_PLUGIN_ROOT/vendor/ast-grep-mcp/dist/cli.js"
-WORKSPACE="/Users/heomin"
+WORKSPACE="${WORKSPACE:-$(mktemp -d "${TMPDIR:-/tmp}/omo-grok-astgrep.XXXXXX")}"
 LIVE_DIR="$WORKSPACE/.omo/live-verify"
 TARGET="$LIVE_DIR/ast-grep-target.ts"
 
