@@ -20,6 +20,7 @@
 - [설치 및 업그레이드](#설치-및-업그레이드)
 - [일상 사용 팁](#일상-사용-팁)
 - [문제 해결](#문제-해결)
+- [Repo Prompt](#repo-prompt)
 - [개발 및 테스트](#개발-및-테스트)
 - [omo-grok vs oh-my-grok](#omo-grok-vs-oh-my-grok)
 - [링크](#링크)
@@ -257,6 +258,40 @@ npm run install-plugin
 
 ---
 
+## Repo Prompt
+
+[Repo Prompt](https://repoprompt.com) / [RepoPrompt CE](https://github.com/repoprompt/repoprompt-ce)는 macOS용 **컨텍스트 엔지니어링** 앱입니다. 파일 선택, CodeMap, 메타 프롬프트를 모아 AI 에이전트에 넘기기 좋게 정리합니다.
+
+이 저장소는 [`.repoprompt/`](./.repoprompt/) 아래 **프로젝트 번들**을 포함합니다. Repo Prompt에 **omo-grok** 워크스페이스로 추가할 때 매번 파일을 찾지 않아도 됩니다.
+
+| 파일 | Repo Prompt에서 쓰는 방법 |
+| --- | --- |
+| [`.repoprompt/meta-prompt.md`](./.repoprompt/meta-prompt.md) | Compose → **Meta prompt** (아키텍처·편집 규칙) |
+| [`.repoprompt/default-selection.txt`](./.repoprompt/default-selection.txt) | **파일 선택**에 아래 경로들 추가 |
+| [`.repoprompt/user-instructions.md`](./.repoprompt/user-instructions.md) | Compose → **User instructions** 템플릿 |
+| [`.repoprompt/project-profile.json`](./.repoprompt/project-profile.json) | 스크립트/도구용 메타데이터 |
+
+### macOS 자동 등록
+
+**Repo Prompt 앱이 실행 중**이어야 합니다. 저장소 루트에서:
+
+```bash
+bash scripts/register-repoprompt-workspace.sh
+```
+
+워크스페이스 이름 **`omo-grok`** 으로 이 폴더를 등록하고, 메타 프롬프트를 best-effort로 붙입니다. `REPOPROMPT_WORKSPACE_NAME=이름` 으로 변경 가능.
+
+### 수동 등록 (UI)
+
+1. **Repo Prompt CE** → **Manage Workspaces**
+2. **Create a New Workspace** → **Add Folders** → `~/omo-grok` 선택
+3. 이름: **`omo-grok`**
+4. **Compose**에서 [`.repoprompt/meta-prompt.md`](./.repoprompt/meta-prompt.md) 붙여 넣고, [`.repoprompt/default-selection.txt`](./.repoprompt/default-selection.txt) 경로들을 선택
+
+자세한 내용: [`.repoprompt/README.md`](./.repoprompt/README.md)
+
+---
+
 ## 개발 및 테스트
 
 ```bash
@@ -290,5 +325,6 @@ printf '%s\n' '{"hookEventName":"UserPromptSubmit","sessionId":"s1","workspaceRo
 - 최신 릴리즈: https://github.com/heomin86/omo-grok/releases/latest
 - 변경 이력: [CHANGELOG.md](./CHANGELOG.md)
 - English README: [README.md](./README.md)
+- Repo Prompt 번들: [`.repoprompt/`](./.repoprompt/)
 
 **라이선스:** SUL-1.0 (저장소 참조)

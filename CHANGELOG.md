@@ -27,6 +27,7 @@ Fix `/ulw-loop` so it correctly hands off to Grok Build's native `/goal` mode an
 - `skills/ulw-loop/references/full-workflow.md` — Acquire Next Goal table and constraints aligned with user-run `/goal`
 - `components/ulw-loop/src/grok-goal-instruction.ts` — handoff surfaces `/goal` lines to the user; reviewers via `spawn_subagent`
 - `README.md` — `/goal` × `ulw-loop` usage, hook contract caveat (PreToolUse-only stdout on 0.2.82), orchestrator fallback
+- **Repo Prompt** — `.repoprompt/` project bundle (meta prompt, default file selection, task template) + `scripts/register-repoprompt-workspace.sh` for macOS workspace registration
 
 ### Known Limitations
 

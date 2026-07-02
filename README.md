@@ -20,6 +20,7 @@ If you want Grok to keep working on a large task until it is **actually verified
 - [Install & upgrade](#install--upgrade)
 - [Daily usage tips](#daily-usage-tips)
 - [Troubleshooting](#troubleshooting)
+- [Repo Prompt](#repo-prompt)
 - [Develop & test](#develop--test)
 - [omo-grok vs oh-my-grok](#omo-grok-vs-oh-my-grok)
 - [Links](#links)
@@ -257,6 +258,40 @@ See [CHANGELOG.md](./CHANGELOG.md) and [Releases](https://github.com/heomin86/om
 
 ---
 
+## Repo Prompt
+
+[Repo Prompt](https://repoprompt.com) / [RepoPrompt CE](https://github.com/repoprompt/repoprompt-ce) is a macOS app for curating repository context (file selection, CodeMaps, meta prompts) before sending work to an AI agent.
+
+This repo ships a **project bundle** under [`.repoprompt/`](./.repoprompt/) so you can add **omo-grok** as a workspace without hunting for the right files each time.
+
+| File | Use in Repo Prompt |
+| --- | --- |
+| [`.repoprompt/meta-prompt.md`](./.repoprompt/meta-prompt.md) | Compose → **Meta prompt** (architecture + editing rules) |
+| [`.repoprompt/default-selection.txt`](./.repoprompt/default-selection.txt) | Add these paths to your **file selection** |
+| [`.repoprompt/user-instructions.md`](./.repoprompt/user-instructions.md) | Compose → **User instructions** template |
+| [`.repoprompt/project-profile.json`](./.repoprompt/project-profile.json) | Metadata for scripts / tooling |
+
+### Register on macOS (automatic)
+
+Repo Prompt must be **running**. From the repo root:
+
+```bash
+bash scripts/register-repoprompt-workspace.sh
+```
+
+This creates (or updates) a workspace named **`omo-grok`** pointing at this folder and best-effort loads the meta prompt. Override the name with `REPOPROMPT_WORKSPACE_NAME=my-name`.
+
+### Register manually (UI)
+
+1. Open **Repo Prompt CE** → **Manage Workspaces**
+2. **Create a New Workspace** → **Add Folders** → select `~/omo-grok` (this clone)
+3. Name it **`omo-grok`**
+4. In **Compose**, paste [`.repoprompt/meta-prompt.md`](./.repoprompt/meta-prompt.md) and add files listed in [`.repoprompt/default-selection.txt`](./.repoprompt/default-selection.txt)
+
+See [`.repoprompt/README.md`](./.repoprompt/README.md) for bundle details.
+
+---
+
 ## Develop & test
 
 ```bash
@@ -291,5 +326,6 @@ Both can be installed; enable **one** primary loop plugin to avoid duplicate Sto
 - Latest release: https://github.com/heomin86/omo-grok/releases/latest
 - Changelog: [CHANGELOG.md](./CHANGELOG.md)
 - Korean README: [README.ko.md](./README.ko.md)
+- Repo Prompt bundle: [`.repoprompt/`](./.repoprompt/)
 
 **License:** SUL-1.0 (see repository)
