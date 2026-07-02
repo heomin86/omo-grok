@@ -33,7 +33,8 @@ screen, not just the text.
 Auxiliary surfaces (CLI stdout / DB state diff / parsed config dump) are first-class evidence for CLI- or data-shaped criteria; use a channel scenario when the behavior is user-facing. `--dry-run`, printing the command, "should respond", and "looks correct" never count.
 
 ## Delegation model (ATLAS-STYLE — YOU CONDUCT, WORKERS PLAY)
-You read, search, plan, integrate, and QA. You DELEGATE every code edit, test write, bug fix, and QA execution to a right-sized Task subagent, then verify what comes back. Fan out independent tasks in PARALLEL in one response; serialize only on a NAMED dependency (one task consumes another's output or edits the same file).
+On Grok Build the delegation tool is `spawn_subagent` (types: `general-purpose`, `explore`, `plan`); poll with `wait_commands_or_subagents` / `get_command_or_subagent_output`. Every "Task subagent"/"worker" below means a `spawn_subagent` call.
+You read, search, plan, integrate, and QA. You DELEGATE every code edit, test write, bug fix, and QA execution to a right-sized `spawn_subagent` worker, then verify what comes back. Fan out independent tasks in PARALLEL in one response; serialize only on a NAMED dependency (one task consumes another's output or edits the same file).
 
 Size each worker to the task. Put the intended role, rigor level, and specialty inside the worker `message`.
 
@@ -51,10 +52,10 @@ For reviewer work, use a self-contained reviewer assignment, tight scope, and ex
 
 Every worker message MUST carry: goal + exact files in scope; the PIN + failing-first proof before production code; constraints + project rules; verification commands; the ONE Manual-QA channel and exact artifact; for git-tracked edits, require `git-master` plus repo and touched-path commit history before commit. Workers have NO interview context — be exhaustive, and forward learnings.
 
-Grok Task delegation reliability:
-- Start every Task prompt with `TASK: <imperative assignment>`, then name `DELIVERABLE`, `SCOPE`, and `VERIFY`. State that it is an executable assignment, not a context handoff.
+Grok subagent delegation reliability:
+- Start every `spawn_subagent` prompt with `TASK: <imperative assignment>`, then name `DELIVERABLE`, `SCOPE`, and `VERIFY`. State that it is an executable assignment, not a context handoff.
 - Paste only the context the child needs; avoid dumping full session history unless truly required.
-- Plan and reviewer agents may run for a long time; launch via Task, keep doing independent root work, and poll in short cycles.
+- Plan and reviewer agents may run for a long time; launch via `spawn_subagent` with `background: true`, keep doing independent root work, and poll in short cycles.
 - While any child is active, keep the parent visibly alive with active subagent count and latest phase.
 - Track spawned work locally. A timeout only means no new update arrived; treat a running child as alive until it returns a deliverable or explicit blocker.
 - Fallback only when the child finishes without the deliverable or reports a blocker; record inconclusive, do not count it as pass/review approval, and respawn a smaller scoped task with the missing deliverable.
@@ -148,11 +149,11 @@ Loop per goal. Cap at 5 cycles per goal. Cap identical same-criterion failures a
 
 | Grok goal state | action |
 |-----------------|--------|
-| no active objective in plan.md | Run `/goal <objective>` using only the handoff objective text; do not copy lifecycle fields such as `status`. |
+| no active objective in plan.md | You cannot invoke `/goal` (it is a user-run slash command). Print the exact `/goal <objective>` line — handoff objective text only, no lifecycle fields such as `status` — for the user to run, then continue executing this story without waiting. |
 | same aggregate objective active | Continue the current ulw-loop story. |
 | different objective active | STOP. Checkpoint blocked and surface the conflict. |
 4. If retrying failed work, run `omo-grok-ulw-loop complete-goals --goal-runtime grok --retry-failed --json`.
-5. Never start a second `/goal` for the same aggregate objective while the first is still active.
+5. Never surface a second `/goal` for the same aggregate objective while the first is still active.
 
 ### Per-Criterion Cycle
 1. PLAN: read `criterion.scenario`, `criterion.expectedEvidence`, prior ledger entries, and safety bounds. Identify which tasks in the current wave are independent.
@@ -220,7 +221,7 @@ Structured prompt directives accepted: `OMO_ULW_LOOP_STEER: { ... }`, `omo.ulw-l
 
 ## Constraints
 1. NEVER call `update_goal({completed:true})` mid-aggregate; only on final story after the quality gate passes.
-2. NEVER start a conflicting `/goal` when goal/plan.md already tracks a different active objective.
+2. NEVER surface a conflicting `/goal` when goal/plan.md already tracks a different active objective.
 3. NEVER mark `criterion.status == "pass"` without captured observable evidence in `record-evidence`.
 4. NEVER bypass the criteria gate: non-final aggregate completion requires all essential criteria; final aggregate completion requires all criteria across the whole plan.
 5. Baseline build/lint/typecheck/test commands are necessary evidence, NOT SUFFICIENT completion proof. Criteria coverage with observable evidence is the gate.
@@ -229,8 +230,8 @@ Structured prompt directives accepted: `OMO_ULW_LOOP_STEER: { ... }`, `omo.ulw-l
 8. Structured steering directives mutate state through validation; normal prose does not.
 9. Evidence MUST be observable from the real surface: tmux transcript, curl status+body, browser/Playwright assertion, CLI stdout, DB state diff, parsed config dump.
 10. Probe the adversarial classes each criterion's trigger facts name (list in Bootstrap step 2); record untriggered classes as not-applicable in one line.
-11. After completing an aggregate ulw-loop run, clear the Grok goal with `/goal clear` before starting another in the same session.
-12. The shell command emits a model-facing handoff; align Grok goal state via `/goal <objective>`, `update_goal`, and `goal/plan.md` — not Codex `get_goal` / `create_goal`.
+11. After completing an aggregate ulw-loop run, ask the user to run `/goal clear` before starting another in the same session.
+12. The shell command emits a model-facing handoff; align Grok goal state via a `/goal <objective>` line surfaced to the user, `update_goal`, and `goal/plan.md` — not Codex `get_goal` / `create_goal`.
 13. NEVER record `--status pass` while a QA-spawned process, `tmux` session, browser context, bound port, container, or temp file / dir is still alive, or while any worker is still open. The evidence string MUST include the cleanup receipt. Leftover runtime state = BLOCKED, not PASS.
 14. DELEGATE all code edits, test writes, fixes, and QA execution to right-sized Task subagents (Delegation table); you read, search, plan, integrate, and QA. NEVER record `--status pass` from a worker's self-report — only from evidence you re-verified yourself. Dispatch independent tasks in parallel; serialize only on a NAMED dependency.
 15. Every verified work unit that touched git-tracked files must leave either an atomic `git-master`-style commit hash or explicit no-commit blocker evidence before the next unit starts.

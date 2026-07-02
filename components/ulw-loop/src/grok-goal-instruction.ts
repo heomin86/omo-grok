@@ -59,7 +59,7 @@ function buildGrokText(
     ...successCriteriaLines(goal.successCriteria),
     "",
     "Grok goal integration constraints:",
-    "- If no active Grok goal exists, run `/goal <objective>` with the payload below (or ensure goal/plan.md objective matches).",
+    "- `/goal` is a USER-run slash command; you cannot invoke slash commands. If no active Grok goal exists, print the exact `/goal <objective>` line (objective payload below) for the user to run, then keep executing this goal without waiting.",
     "- Read goal state via goal/plan.md or `omo-grok-ulw-loop grok-goal-snapshot read --session-id <id>`.",
     "- Goals are unlimited. Do not add numeric limits.",
     ...grokModeConstraintLines(mode, isFinal),
@@ -74,14 +74,14 @@ function buildGrokText(
 function grokModeConstraintLines(mode: UlwLoopCodexGoalMode, isFinal: boolean): string[] {
   if (mode === "per_story") {
     return [
-      "- Read goal/plan.md. If no matching active goal, run `/goal <objective>`.",
+      "- Read goal/plan.md. If no matching active goal, surface the `/goal <objective>` line for the user to run.",
       "- If a different active Grok goal exists, finish/checkpoint before starting this ulw-loop story.",
       "- Work only this goal until its completion audit passes.",
     ];
   }
   return [
     "- Grok /goal = the whole omo ulw-loop run; OMO G001/G002/etc. = ledger stories.",
-    "- Read goal/plan.md. If no active goal, run `/goal` with the aggregate objective below.",
+    "- Read goal/plan.md. If no active goal, surface `/goal` with the aggregate objective below for the user to run.",
     "- If the active Grok goal objective matches the aggregate payload, continue without a new `/goal`.",
     isFinal
       ? "- This is the final story; call update_goal({completed: true, message}) only after the mandatory quality gate passes."
@@ -104,14 +104,14 @@ function grokFinalSection(
   return [
     "Final story — run mandatory quality gate before update_goal:",
     "- Run targeted verification for changed behavior.",
-    "- Spawn final reviewers via Task/delegate_task.",
+    "- Spawn final reviewers via spawn_subagent.",
     "- If review is blocked, record blockers first:",
     `  ${blocker}`,
     aggregate
       ? "- If clean, call update_goal({completed: true, message: \"...\"}), then checkpoint:"
       : "- If clean, call update_goal({completed: true}), then checkpoint:",
     `  ${checkpoint}`,
-    "- After aggregate completion, run `/goal clear` before starting another ulw-loop run.",
+    "- After aggregate completion, ask the user to run `/goal clear` before starting another ulw-loop run.",
   ].join("\n");
 }
 

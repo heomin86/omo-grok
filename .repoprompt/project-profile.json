@@ -1,0 +1,26 @@
+{
+  "name": "omo-grok",
+  "title": "omo-grok — Grok Build × lazycodex ulw-loop",
+  "description": "Grok Build plugin adapter for oh-my-openagent Light: /goal × /ulw-loop, .omo/ state, comment-checker, headless orchestrator.",
+  "repository": "https://github.com/heomin86/omo-grok",
+  "homepage": "https://github.com/heomin86/omo-grok",
+  "defaultBranch": "main",
+  "language": "TypeScript",
+  "tags": ["grok-build", "ulw-loop", "lazycodex", "omo", "plugin", "goal-mode"],
+  "roots": [
+    {
+      "label": "omo-grok",
+      "path": ".",
+      "note": "Plugin source at repo root (~/omo-grok after clone)."
+    }
+  ],
+  "artifacts": {
+    "metaPrompt": ".repoprompt/meta-prompt.md",
+    "defaultSelection": ".repoprompt/default-selection.txt",
+    "userInstructionsTemplate": ".repoprompt/user-instructions.md"
+  },
+  "related": {
+    "lazycodex": "https://github.com/code-yeongyu/lazycodex",
+    "grokGoal": "https://x.ai/news/introducing-goal"
+  }
+}

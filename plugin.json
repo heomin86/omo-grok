@@ -1,6 +1,6 @@
 {
   "name": "omo-grok",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "oh-my-openagent Light edition for Grok Build CLI — rules (.omo/rules), comment-checker, ultrawork, ulw-loop, boulder continuation, LSP, ast-grep",
   "skills": ["./skills"],
   "author": {
