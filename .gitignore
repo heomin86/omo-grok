@@ -1,9 +1,12 @@
 # Dependencies
 node_modules/
 
-# Build output
-dist/
-components/*/dist/
+# Build output (root only — preserves vendor/*/dist prebuilt MCP binaries)
+/dist/
+/components/ulw-loop/dist/
+
+# Runtime workspace state — session data, ulw-loop, boulder
+.omo/
 
 # Logs
 *.log
